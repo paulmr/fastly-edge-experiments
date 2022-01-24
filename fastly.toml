@@ -1,0 +1,9 @@
+# This file describes a Fastly Compute@Edge package. To learn more visit:
+# https://developer.fastly.com/reference/fastly-toml/
+
+authors = ["paul.roberts@theguardian.com"]
+description = "Just messing around, getting to grips with it"
+language = "assemblyscript"
+manifest_version = 2
+name = "fastly-edge-experiments"
+service_id = "3MIHkVgU88iiRLTjKb3JdU"
