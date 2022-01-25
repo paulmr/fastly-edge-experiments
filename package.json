@@ -18,6 +18,7 @@
     "node": "^16"
   },
   "devDependencies": {
+    "as-inliner": "^0.0.3",
     "assemblyscript": "^0.19.18"
   },
   "dependencies": {

@@ -1,23 +1,49 @@
-# Compute@Edge default starter kit for AssemblyScript
+# Intro
 
-[![Deploy to Fastly](https://deploy.edgecompute.app/button)](https://deploy.edgecompute.app/deploy)
+This is an assemblyscript project which experiments with Fastly
+[compute@edge](https://developer.fastly.com/learning/compute/assemblyscript).
 
-Get to know the Fastly Compute@Edge environment with a basic starter that demonstrates routing, simple synthetic responses and code comments that cover common patterns.
+It was built initially by running `fastly compute init` and then
+customised. In order to make it easier to run and test, there is a
+vagrant file so you don't actually have anything install locally
+(except vagrant) if you do want to run it that way.
 
-**For more details about other starter kits for Compute@Edge, see the [Fastly developer hub](https://developer.fastly.com/solutions/starters)**
+That leaves you the choice of either installing everything locally
+using the vagrant box but then either way you can run the following
+commands (locally or via `vagrant ssh` to get a session in the virtual
+machine).
 
-## Features
+# Building
 
-* Allow only requests with particular HTTP methods
-* Match request URL path and methods for routing
-* Build synthetic responses at the edge
+```shell
+$ fastly compute build
+```
 
-## Understanding the code
+# Running locally
 
-This starter is intentionally lightweight, and requires no dependencies aside from the [`@fastly/as-compute`](https://www.npmjs.com/package/@fastly/as-compute) npm package. It will help you understand the basics of processing requests at the edge using Fastly. This starter includes implementations of common patterns explained in our [using Compute@Edge](https://developer.fastly.com/learning/compute/assemblyscript/) and [VCL migration](https://developer.fastly.com/learning/compute/migrate/) guides.
+```shell
+$ fastly compute serve
+```
 
-The starter doesn't require the use of any backends. Once deployed, you will have a Fastly service running on Compute@Edge that can generate synthetic responses at the edge.
+This command will run a local version of the __compute@edge__ platform
+listening on (by default) port 7676:
 
-## Security issues
+``` shell
+$ curl -
+```
 
-Please see our [SECURITY.md](SECURITY.md) for guidance on reporting security-related issues.
+# Deploying
+
+# Setting up with Vagrant
+
+To run this in a vagrant box, you can do:
+
+```shell
+$ vagrant up
+[…]
+$ vagrant ssh --command 'cd /vagrant; fastly compute serve --addr='0.0.0.0:7676' --watch'
+```
+
+In other words, just do a `vagrant up` and then you can use `vagrant
+ssh` to login into the machine, cd to `/vagrant` and then run any of
+the above `fastly` CLI commands.

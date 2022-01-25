@@ -1,5 +1,6 @@
 
 //! Default Compute@Edge template program.
+import { JSONEncoder } from "assemblyscript-json";
 import { Request, Response, Headers, URL, Fastly } from "@fastly/as-compute";
 
 // The entry point for your application.
@@ -8,6 +9,10 @@ import { Request, Response, Headers, URL, Fastly } from "@fastly/as-compute";
 // used to route based on the request properties (such as method or path), send
 // the request to a backend, make completely new requests, and/or generate
 // synthetic responses.
+
+const testGroup: Array<String> = Inliner.inlineFileAsString(
+  "../data.csv"
+).split("\n");
 
 function main(req: Request): Response {
     // Filter requests that have unexpected methods.
@@ -22,46 +27,21 @@ function main(req: Request): Response {
     let url = new URL(req.url);
 
     // If request is to the `/` path...
-    if (url.pathname == "/") {
-        // Below are some common patterns for Compute@Edge services using AssemblyScript.
-        // Head to https://developer.fastly.com/learning/compute/assemblyscript/ to discover more.
+    if (url.pathname.startsWith("/id/")) {
+        let id = url.pathname.substring(4)
 
-        // Create a new request.
-        // let bereq = new Request("http://example.com", {
-        //     method: "GET",
-        //     headers: null,
-        //     body: null
-        // });    
-
-        // Add request headers.
-        // req.headers.set("X-Custom-Header", "Welcome to Compute@Edge!");
-        // req.headers.set(
-        //   "X-Another-Custom-Header",
-        //   "Recommended reading: https://developer.fastly.com/learning/compute"
-        // );
-
-        // Create a cache override.
-        // let cacheOverride = new Fastly.CacheOverride();
-        // cacheOverride.setTTL(60);
-
-        // Forward the request to a backend.
-        // let beresp = Fastly.fetch(req, {
-        //     backend: "backend_name",
-        //     cacheOverride,
-        // }).wait();
-
-        // Remove response headers.
-        // beresp.headers.delete("X-Another-Custom-Header");
-
-        // Log to a Fastly endpoint.
-        // const logger = Fastly.getLogEndpoint("my_endpoint");
-        // logger.log("Hello from the edge!");
-
-        // Send a default synthetic response.
         let headers = new Headers();
-        headers.set('Content-Type', 'text/html; charset=utf-8');
+        headers.set('Content-Type', 'application/json; charset=utf-8');
 
-        return new Response(String.UTF8.encode("<iframe src='https://developer.fastly.com/compute-welcome' style='border:0; position: absolute; top: 0; left: 0; width: 100%; height: 100%'></iframe>\n"), {
+        let res = new JSONEncoder();
+        res.setString('id', id);
+
+        if(testGroup.includes(id)) {
+            res.setString('group', 'test');
+        } else {
+            res.setString('group', 'none');
+        }
+        return new Response(String.UTF8.encode("{" + res.toString() + "}"), {
             status: 200,
             headers,
             url: null
