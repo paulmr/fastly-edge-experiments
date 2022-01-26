@@ -34,6 +34,24 @@ $ curl -
 
 # Deploying
 
+To deploy to fastly, you need to have obtained a token for your
+service, and then you can run:
+
+``` shell
+$ fastly configure
+```
+
+to have the fastly tool save it in a file (alternatively you can make
+it available via an env var if you don't want it to be permanent).
+
+That done, you can just use:
+
+``` shell
+$ fastly deploy
+```
+
+to upload it.
+
 # Setting up with Vagrant
 
 To run this in a vagrant box, you can do:
