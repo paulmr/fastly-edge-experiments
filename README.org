@@ -1,0 +1,144 @@
+* Intro
+:PROPERTIES:
+:header-args: :results verbatim
+:END:
+
+** Configuring the fastly CLI
+
+#+begin_src sh
+fastly version
+#+end_src
+
+#+RESULTS:
+: Fastly CLI version 1.6.0 (49d5ad0)
+: Built with go version go1.17.6 linux/amd64
+: Viceroy version: viceroy 0.2.9
+
+#+begin_src sh :results none
+fastly configure
+#+end_src
+
+* Building
+
+* Running locally
+
+* Deploying
+
+* Uploading the data
+:PROPERTIES:
+:header-args:      :var dict_name="metering_test_members"
+:END:
+
+This demo uses a [[https://developer.fastly.com/reference/cli/dictionary/][fastly dictionary]] to store the list of UUIDs which
+should be considered part of the group.
+
+Dictionaries are part of the fastly service to which this application
+is being applied, and as such they need be created and versioned
+within the service. The service being used in this instance is defined
+in the ~fastly.toml~ file.
+
+** Creating the dictionary
+
+If the dictionary has not already been created, you can do so with the
+following command. The ~--autoclone~ will clone the current version of
+the service if it is not editable, effectively creating a new version
+which has the dictionary attached to it.
+
+#+begin_src sh :export code
+  fastly dictionary create \
+         --version=latest \
+         --autoclone \
+         --name=$dict_name
+#+end_src
+
+#+RESULTS:
+|                                                                                              |
+| SUCCESS: Created dictionary metering_test_members (service 3MIHkVgU88iiRLTjKb3JdU version 9) |
+
+To get the ID of the created dictionary, which you will then need
+later for adding:
+
+#+name: dict_info
+#+begin_src sh
+  fastly dictionary describe \
+         --name=$dict_name \
+         --version=latest 
+#+end_src
+
+#+RESULTS: dict_info
+| Service  | ID:                    | 3MIHkVgU88iiRLTjKb3JdU |            |       |
+| Version: | 9                      |                        |            |       |
+| ID:      | 4xj40y1vB0HefTIp9GNgry |                        |            |       |
+| Name:    | metering_test_members  |                        |            |       |
+| Write    | Only:                  | false                  |            |       |
+| Created  | (UTC):                 | 2022-01-26             |      14:45 |       |
+| Last     | edited                 | (UTC):                 | 2022-01-26 | 14:45 |
+
+*** Deleting dictionaries
+
+If neccessary you can delete a dictionary like this:
+
+#+begin_src sh
+fastly dictionary delete --version=latest --name=$dict_name
+#+end_src
+
+#+RESULTS:
+|                                                                                              |
+| SUCCESS: Deleted dictionary metering_test_members (service 3MIHkVgU88iiRLTjKb3JdU version 9) |
+
+** Adding an item to the dictionary
+:PROPERTIES:
+:header-args: :var dict_id=dict_info[2,1]
+:END:
+
+*** Adding a single item
+
+Items are added to the dictionary using the command [[https://developer.fastly.com/reference/cli/dictionary-item/update/][dictionary-item
+update]]: (~update~ will create or replace a value)
+
+#+begin_src sh 
+  fastly dictionary-item update \
+         --dictionary-id=$dict_id \
+         --key=D711928B-E9CA-443F-BB6D-5DB427343014 \
+         --value=test-group-1
+#+end_src
+
+#+RESULTS:
+|                                                                                                       |                                    |
+| SUCCESS: Created dictionary item D711928B-E9CA-443F-BB6D-5DB427343014 (service 3MIHkVgU88iiRLTjKb3JdU | dictionary 4xj40y1vB0HefTIp9GNgry) |
+
+*** Adding all of the items
+
+This will read from the ~data.json~ file, which should look like this:
+
+#+begin_src json
+  {
+    "items": [
+      {
+      "op": "create",
+      "item_key": "test-key",
+      "item_value": "new-value"
+    },
+      {
+      "op": "update",
+      "item_key": "test-key-2",
+      "item_value": "new-value-2"
+    },
+      {
+      "op": "upsert",
+      "item_key": "test-key-3",
+      "item_value": "new-value-3"
+    }
+    ]
+  }
+#+end_src
+
+#+begin_src sh
+  fastly dictionary-item update \
+         --dictionary-id=$dict_id \
+         --file data.json
+#+end_src
+
+#+RESULTS:
+|                                                                                                        |
+| SUCCESS: Made 999 modifications of Dictionary 5C4kZwmJXdVHsPOX2z4dH7 on service 3MIHkVgU88iiRLTjKb3JdU |
