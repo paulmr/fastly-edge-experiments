@@ -14,6 +14,20 @@ const testGroup: Array<String> = Inliner.inlineFileAsString(
   "../data.csv"
 ).split("\n");
 
+const debugLog = Fastly.getLogEndpoint("debug")
+
+function log(s: string): void {
+    debugLog.log(s)
+}
+
+function static_lookup(id: string): string {
+    return testGroup.includes(id) ? 'test-1' : 'none';
+}
+
+function dictionary_lookup(id: string): string {
+    return "unimplemented";
+}
+
 function main(req: Request): Response {
     // Filter requests that have unexpected methods.
     if (!["HEAD", "GET"].includes(req.method)) {
@@ -26,32 +40,34 @@ function main(req: Request): Response {
 
     let url = new URL(req.url);
 
-    // If request is to the `/` path...
-    if (url.pathname.startsWith("/id/")) {
-        let id = url.pathname.substring(4)
+    let path = url.pathname.split("/")
+    let commands = path[1].split(",")
+    let id = path.slice(2).join("/")
 
-        let headers = new Headers();
-        headers.set('Content-Type', 'application/json; charset=utf-8');
+    let headers = new Headers();
+    headers.set('Content-Type', 'application/json; charset=utf-8');
 
-        let res = new JSONEncoder();
-        res.setString('id', id);
+    let res = new JSONEncoder();
 
-        if(testGroup.includes(id)) {
-            res.setString('group', 'test');
-        } else {
-            res.setString('group', 'none');
+    for(let i = 0; i < commands.length; i++) {
+        let command = commands[i];
+        res.pushObject(command);
+        res.setString("id", id);
+
+        if(command == "static") {
+            res.setString("group", static_lookup(id));
         }
-        return new Response(String.UTF8.encode("{" + res.toString() + "}"), {
-            status: 200,
-            headers,
-            url: null
-        });
+
+        if(command == "dic") {
+            res.setString("group", dictionary_lookup(id));
+        }
+
+        res.popObject();
     }
 
-    // Catch all other requests and return a 404.
-    return new Response(String.UTF8.encode("The page you requested could not be found"), {
-        status: 404,
-        headers: null,
+    return new Response(String.UTF8.encode("{" + res.toString() + "}"), {
+        status: 200,
+        headers,
         url: null
     });
 }
