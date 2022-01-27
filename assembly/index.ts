@@ -14,6 +14,8 @@ const testGroup: Array<String> = Inliner.inlineFileAsString(
   "../data.csv"
 ).split("\n");
 
+const dictionary = new Fastly.Dictionary("metering_test_members");
+
 const debugLog = Fastly.getLogEndpoint("debug")
 
 function log(s: string): void {
@@ -25,7 +27,7 @@ function static_lookup(id: string): string {
 }
 
 function dictionary_lookup(id: string): string {
-    return "unimplemented";
+    return dictionary.contains(id) ? 'test-1' : 'none';
 }
 
 function main(req: Request): Response {
