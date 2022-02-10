@@ -23,16 +23,34 @@ function log(s: string): void {
 }
 
 function static_lookup(id: string): string {
-    return testGroup.includes(id) ? 'test-1' : 'none';
+    return testGroup.includes(id) ? 'test-1' : 'NotInTest';
 }
 
 function dictionary_lookup(id: string): string {
-    return dictionary.contains(id) ? 'test-1' : 'none';
+    return dictionary.contains(id) ? 'test-1' : 'NotInTest';
+}
+
+function extractParams(body: string): Map<string, string[]> {
+    let res = new Map<string, string[]>();
+    let params = body.split("&");
+    for(let i = 0; i < params.length; i++) {
+        let keyval = params[i].split("=", 2);
+        let key = keyval[0];
+        let val = keyval[1];
+        if(res.has(keyval[0])) {
+            res.get(keyval[0]).push(keyval[1]);
+        } else {
+            res.set(key, [ val ]);
+        }
+//        log(key + " => " + val);
+    };
+
+    return res;
 }
 
 function main(req: Request): Response {
     // Filter requests that have unexpected methods.
-    if (!["HEAD", "GET"].includes(req.method)) {
+    if (req.method != "POST") {
         return new Response(String.UTF8.encode("This method is not allowed"), {
             status: 405,
             headers: null,
@@ -42,30 +60,20 @@ function main(req: Request): Response {
 
     let url = new URL(req.url);
 
-    let path = url.pathname.split("/")
-    let commands = path[1].split(",")
-    let id = path.slice(2).join("/")
+    let params = extractParams(req.text());
+    let id = params.get("browserId")[0];
 
     let headers = new Headers();
     headers.set('Content-Type', 'application/json; charset=utf-8');
 
     let res = new JSONEncoder();
 
-    for(let i = 0; i < commands.length; i++) {
-        let command = commands[i];
-        res.pushObject(command);
-        res.setString("id", id);
+    res.setString("browserId", id);
+    res.setString("testGroup", dictionary_lookup(id));
 
-        if(command == "static") {
-            res.setString("group", static_lookup(id));
-        }
-
-        if(command == "dic") {
-            res.setString("group", dictionary_lookup(id));
-        }
-
-        res.popObject();
-    }
+    // if(command == "static") {
+    //     res.setString("group", static_lookup(id));
+    // }
 
     return new Response(String.UTF8.encode("{" + res.toString() + "}"), {
         status: 200,
