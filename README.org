@@ -24,6 +24,37 @@ fastly configure
 
 * Deploying
 
+#+begin_src shell
+fastly compute deploy
+#+end_src
+
+To find out which domain(s) is attached to the service, which forms
+the URL that you need to hit in order to test the deployed artifact,
+you can use:
+
+#+name: domain_name
+#+begin_src shell :results table
+fastly domain list --version=active
+#+end_src
+
+#+RESULTS: domain_name
+| SERVICE                | VERSION | NAME                                      | COMMENT |
+| 3MIHkVgU88iiRLTjKb3JdU |      10 | regularly-evident-monitor.edgecompute.app |         |
+
+Then you can hit this domain like this:
+
+#+begin_src shell
+curl https://regularly-evident-monitor.edgecompute.app/dic/123456 | jq .
+#+end_src
+
+#+RESULTS:
+: {
+:   "dic": {
+:     "id": "123456",
+:     "group": "none"
+:   }
+: }
+
 * Uploading the data
 :PROPERTIES:
 :header-args:      :var dict_name="metering_test_members"
@@ -52,8 +83,8 @@ which has the dictionary attached to it.
 #+end_src
 
 #+RESULTS:
-|                                                                                              |
-| SUCCESS: Created dictionary metering_test_members (service 3MIHkVgU88iiRLTjKb3JdU version 9) |
+|                                                                                               |
+| SUCCESS: Created dictionary metering_test_members (service 3MIHkVgU88iiRLTjKb3JdU version 11) |
 
 To get the ID of the created dictionary, which you will then need
 later for adding:
@@ -67,12 +98,12 @@ later for adding:
 
 #+RESULTS: dict_info
 | Service  | ID:                    | 3MIHkVgU88iiRLTjKb3JdU |            |       |
-| Version: | 9                      |                        |            |       |
-| ID:      | 4xj40y1vB0HefTIp9GNgry |                        |            |       |
+| Version: | 11                     |                        |            |       |
+| ID:      | 6nWnMmmm2JkekXSsvaac1Q |                        |            |       |
 | Name:    | metering_test_members  |                        |            |       |
 | Write    | Only:                  | false                  |            |       |
-| Created  | (UTC):                 | 2022-01-26             |      14:45 |       |
-| Last     | edited                 | (UTC):                 | 2022-01-26 | 14:45 |
+| Created  | (UTC):                 | 2022-02-09             |      14:37 |       |
+| Last     | edited                 | (UTC):                 | 2022-02-09 | 14:37 |
 
 *** Deleting dictionaries
 
@@ -83,8 +114,8 @@ fastly dictionary delete --version=latest --name=$dict_name
 #+end_src
 
 #+RESULTS:
-|                                                                                              |
-| SUCCESS: Deleted dictionary metering_test_members (service 3MIHkVgU88iiRLTjKb3JdU version 9) |
+|                                                                                               |
+| SUCCESS: Deleted dictionary metering_test_members (service 3MIHkVgU88iiRLTjKb3JdU version 11) |
 
 ** Adding an item to the dictionary
 :PROPERTIES:
@@ -141,4 +172,7 @@ This will read from the ~data.json~ file, which should look like this:
 
 #+RESULTS:
 |                                                                                                        |
-| SUCCESS: Made 999 modifications of Dictionary 5C4kZwmJXdVHsPOX2z4dH7 on service 3MIHkVgU88iiRLTjKb3JdU |
+| SUCCESS: Made 999 modifications of Dictionary 6nWnMmmm2JkekXSsvaac1Q on service 3MIHkVgU88iiRLTjKb3JdU |
+
+* Profiling
+
