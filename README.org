@@ -57,7 +57,7 @@ curl https://regularly-evident-monitor.edgecompute.app/dic/123456 | jq .
 
 * Uploading the data
 :PROPERTIES:
-:header-args:      :var dict_name="metering_test_members"
+:header-args:      :var dict_name="metering_test_members_ex"
 :END:
 
 This demo uses a [[https://developer.fastly.com/reference/cli/dictionary/][fastly dictionary]] to store the list of UUIDs which
@@ -97,13 +97,6 @@ later for adding:
 #+end_src
 
 #+RESULTS: dict_info
-| Service  | ID:                    | 3MIHkVgU88iiRLTjKb3JdU |            |       |
-| Version: | 11                     |                        |            |       |
-| ID:      | 6nWnMmmm2JkekXSsvaac1Q |                        |            |       |
-| Name:    | metering_test_members  |                        |            |       |
-| Write    | Only:                  | false                  |            |       |
-| Created  | (UTC):                 | 2022-02-09             |      14:37 |       |
-| Last     | edited                 | (UTC):                 | 2022-02-09 | 14:37 |
 
 *** Deleting dictionaries
 
@@ -172,7 +165,7 @@ This will read from the ~data.json~ file, which should look like this:
 
 #+RESULTS:
 |                                                                                                        |
-| SUCCESS: Made 999 modifications of Dictionary 6nWnMmmm2JkekXSsvaac1Q on service 3MIHkVgU88iiRLTjKb3JdU |
+| SUCCESS: Made 999 modifications of Dictionary 7FR4LNIJbktk8u0dODKXpO on service 5yAc3QZNZQ0AxBfjeMJTjk |
 
 * Profiling
 

@@ -1,33 +1,24 @@
-
 //! Default Compute@Edge template program.
 import { JSONEncoder } from "assemblyscript-json";
+import { decodeURIComponent } from "as-uri-encode-decode"
 import { Request, Response, Headers, URL, Fastly } from "@fastly/as-compute";
 
-// The entry point for your application.
-//
-// Use this function to define your main request handling logic. It could be
-// used to route based on the request properties (such as method or path), send
-// the request to a backend, make completely new requests, and/or generate
-// synthetic responses.
-
-const testGroup: Array<String> = Inliner.inlineFileAsString(
-  "../data.csv"
-).split("\n");
-
-const dictionary = new Fastly.Dictionary("metering_test_members");
-
+const dictionaryName = "metering_test_members_ex";
 const debugLog = Fastly.getLogEndpoint("debug")
-
-function log(s: string): void {
-    debugLog.log(s)
-}
+const dictionary = new Fastly.Dictionary(dictionaryName);
 
 function static_lookup(id: string): string {
-    return testGroup.includes(id) ? 'test-1' : 'NotInTest';
+    return testGroup.includes(id) ? 'Test' : 'NotInTest';
 }
 
 function dictionary_lookup(id: string): string {
-    return dictionary.contains(id) ? 'test-1' : 'NotInTest';
+    if(dictionary.contains(id)) {
+        let res = dictionary.get(id);
+        return res ? res : 'Test';
+    } else {
+        debugLog.log("missing (" + id + ")");
+        return 'NotInTest';
+    }
 }
 
 function extractParams(body: string): Map<string, string[]> {
@@ -36,15 +27,13 @@ function extractParams(body: string): Map<string, string[]> {
     for(let i = 0; i < params.length; i++) {
         let keyval = params[i].split("=", 2);
         let key = keyval[0];
-        let val = keyval[1];
+        let val = decodeURIComponent(keyval[1]);
         if(res.has(keyval[0])) {
             res.get(keyval[0]).push(keyval[1]);
         } else {
             res.set(key, [ val ]);
         }
-//        log(key + " => " + val);
     };
-
     return res;
 }
 

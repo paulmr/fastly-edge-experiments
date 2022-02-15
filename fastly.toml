@@ -2,8 +2,12 @@
 # https://developer.fastly.com/reference/fastly-toml/
 
 authors = ["paul.roberts@theguardian.com"]
-description = "Just messing around, getting to grips with it"
+description = "testing the viability of dictionaries"
 language = "assemblyscript"
 manifest_version = 2
-name = "fastly-edge-experiments"
-service_id = "3MIHkVgU88iiRLTjKb3JdU"
+name = "metering-at-edge-test"
+service_id = "5yAc3QZNZQ0AxBfjeMJTjk"
+
+[local_server.dictionaries.metering_test_members_ex]
+file = "local_dict.json"
+format = "json"
