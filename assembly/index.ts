@@ -60,10 +60,6 @@ function main(req: Request): Response {
     res.setString("browserId", id);
     res.setString("testGroup", dictionary_lookup(id));
 
-    // if(command == "static") {
-    //     res.setString("group", static_lookup(id));
-    // }
-
     return new Response(String.UTF8.encode("{" + res.toString() + "}"), {
         status: 200,
         headers,

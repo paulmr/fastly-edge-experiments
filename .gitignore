@@ -4,3 +4,6 @@
 data.csv
 .vagrant
 /data.json
+*.csv
+local_dict.json
+urls.txt
